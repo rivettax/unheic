@@ -1,0 +1,10 @@
+# railway.toml
+[build]
+dockerfile = "./Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+restartPolicyType = "on_failure"
+
+[services]
+http = { port = 8080 }
