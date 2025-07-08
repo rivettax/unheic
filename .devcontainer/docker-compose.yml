@@ -1,0 +1,10 @@
+services:
+  unheic:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      
+    volumes:
+      - ../..:/workspaces:cached
+
+    command: sleep infinity
