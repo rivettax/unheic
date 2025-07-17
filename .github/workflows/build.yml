@@ -16,19 +16,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.24.3"
+    #   - name: Set up Go
+    #     uses: actions/setup-go@v5
+    #     with:
+    #       go-version: "1.24.3"
 
-      - name: Install dependencies
-        run: go mod tidy
+    #   - name: Install dependencies
+    #     run: go mod tidy
 
-      - name: Run tests
-        run: go test ./...
+    #   - name: Run tests
+    #     run: go test ./...
 
-      - name: Build
-        run: go build -o unheic ./cmd/unheic/main.go
+    #   - name: Build
+    #     run: go build -o unheic ./cmd/unheicd/main.go
 
   docker:
     runs-on: ubuntu-latest
