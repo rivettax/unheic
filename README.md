@@ -171,7 +171,7 @@ Error responses include descriptive messages:
 
 ## Configuration
 
-The server can be configured by modifying the following parameters in `cmd/unheicd/main.go`:
+The server can be configured by modifying the following environment variables:
 
 - **Port**: Provide `PORT` environment variable
 - **Timeouts**: Adjust `READ_TIMEOUT`, `WRITE_TIMEOUT`, and `IDLE_TIMEOUT` environment variables
