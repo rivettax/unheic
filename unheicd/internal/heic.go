@@ -2,29 +2,29 @@ package internal
 
 import (
 	"context"
-	"fmt"
 	"image/jpeg"
 	"io"
 
 	"github.com/jdeng/goheif"
 )
 
+type DecodeError struct{ Err error }
+
+func (e DecodeError) Error() string { return e.Err.Error() }
+
+type EncodeError struct{ Err error }
+
+func (e EncodeError) Error() string { return e.Err.Error() }
+
 func HeicToJPEG(ctx context.Context, w io.Writer, r io.Reader) error {
-	// Decode the HEIC image
 	img, err := goheif.Decode(r)
 	if err != nil {
-		return fmt.Errorf("decoding HEIC image: %w", err)
+		return DecodeError{err}
 	}
 
-	// Set JPEG encoding options
-	options := jpeg.Options{
-		Quality: 90,
-	}
-
-	// Encode as JPEG
-	err = jpeg.Encode(w, img, &options)
+	err = jpeg.Encode(w, img, &jpeg.Options{Quality: 90})
 	if err != nil {
-		return fmt.Errorf("encoding JPEG image: %w", err)
+		return EncodeError{err}
 	}
 
 	return nil

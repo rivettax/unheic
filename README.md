@@ -14,12 +14,12 @@ A simple HTTP API service that converts HEIC/HEIF images to JPEG format using Go
 
 - Go 1.22.3 or later
 
-## Installation
+## Development
 
 1. Clone the repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/rivettax/unheic
 cd unheic
 ```
 
@@ -31,17 +31,34 @@ go mod download
 
 ## Running the Service
 
+This service can be run directly using the Docker container. The container is published on GitHub Container Registry.
+
 ### Start the API Server
 
 ```bash
-# Run the HEIC to JPEG conversion API
-go run cmd/unheicd/main.go
+docker run -p 8080:8080 ghcr.io/rivettax/unheic:latest
 ```
 
 The server will start on port 8080. You should see:
 
 ```
 Starting server on :8080
+```
+
+### Docker Compose
+
+```yaml
+services:
+  unheic:
+    image: ghcr.io/rivettax/unheic:latest
+    restart: unless-stopped
+    ports:
+      - 8080:8080 # optional port mapping if you want to forward to localhost
+    environment:
+      - PORT=8080
+      - READ_TIMEOUT=30
+      - WRITE_TIMEOUT=30
+      - IDLE_TIMEOUT=60
 ```
 
 ### API Endpoints
@@ -164,8 +181,23 @@ The API returns appropriate HTTP status codes:
 Error responses include descriptive messages:
 
 ```json
+// 400 Bad Request
 {
-  "error": "Failed to convert image: <error details>"
+  "error": "decoding HEIF image: <error details>"
+}
+```
+
+```json
+// 500 Internal Server Error
+{
+  "error": "encoding JPEG image: <error details>"
+}
+```
+
+```json
+// 500 Internal Server Error
+{
+  "error": "converting HEIF to JPEG: <error details>"
 }
 ```
 

@@ -19,24 +19,27 @@ const (
 )
 
 func main() {
+	if err := run(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func run() error {
+	// configuration options are provided as environment variables with reasonable defaults
 	port := getEnvAsInt("PORT", defaultPort)
 	readTimeout := getEnvAsInt("READ_TIMEOUT", defaultReadTimeout)
 	writeTimeout := getEnvAsInt("WRITE_TIMEOUT", defaultWriteTimeout)
 	idleTimeout := getEnvAsInt("IDLE_TIMEOUT", defaultIdleTimeout)
 
-	// Create a new HTTP server
 	mux := http.NewServeMux()
 
-	// Register the HEIF to JPEG conversion endpoint
 	mux.HandleFunc("POST /convert", handleHeifToJpeg)
 
-	// Health check endpoint
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
 	})
 
-	// Configure server
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", port),
 		Handler:      mux,
@@ -46,20 +49,29 @@ func main() {
 	}
 
 	log.Printf("Starting server on :%d", port)
-	log.Fatal(server.ListenAndServe())
+
+	err := server.ListenAndServe()
+	if err != nil {
+		return fmt.Errorf("failed to start server: %w", err)
+	}
+
+	return nil
 }
 
 func handleHeifToJpeg(w http.ResponseWriter, r *http.Request) {
-	// Set response headers
 	w.Header().Set("Content-Type", "image/jpeg")
 	w.Header().Set("Content-Disposition", "attachment; filename=converted.jpg")
 
-	// Convert HEIF to JPEG
 	err := internal.HeicToJPEG(r.Context(), w, r.Body)
 	if err != nil {
-		log.Printf("Error converting HEIF to JPEG: %v", err)
-		http.Error(w, "Failed to convert image: "+err.Error(), http.StatusBadRequest)
-		return
+		switch err.(type) {
+		case internal.DecodeError:
+			http.Error(w, "decoding HEIF image: "+err.Error(), http.StatusBadRequest)
+		case internal.EncodeError:
+			http.Error(w, "encoding JPEG image: "+err.Error(), http.StatusInternalServerError)
+		default:
+			http.Error(w, "converting HEIF to JPEG: "+err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 
@@ -71,7 +83,7 @@ func getEnvAsInt(key string, defaultValue int) int {
 
 	intValue, err := strconv.Atoi(value)
 	if err != nil {
-		log.Fatalf("Invalid %s: %v", key, err)
+		log.Fatalf("invalid %s: %v", key, err)
 	}
 
 	return intValue
