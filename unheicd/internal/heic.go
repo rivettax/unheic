@@ -10,7 +10,6 @@ import (
 )
 
 func HeicToJPEG(ctx context.Context, w io.Writer, r io.Reader) error {
-
 	// Decode the HEIC image
 	img, err := goheif.Decode(r)
 	if err != nil {

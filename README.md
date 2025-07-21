@@ -173,9 +173,8 @@ Error responses include descriptive messages:
 
 The server can be configured by modifying the following parameters in `cmd/unheicd/main.go`:
 
-- **Port**: Change `:8080` to your preferred port
-- **Timeouts**: Adjust `ReadTimeout`, `WriteTimeout`, and `IdleTimeout`
-- **Conversion Timeout**: Modify the context timeout in `handleHeifToJpeg`
+- **Port**: Provide `PORT` environment variable
+- **Timeouts**: Adjust `READ_TIMEOUT`, `WRITE_TIMEOUT`, and `IDLE_TIMEOUT` environment variables
 
 ## Dependencies
 
