@@ -1,4 +1,3 @@
 package unheic
 
-type Client struct {
-}
+type Client struct{}

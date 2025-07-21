@@ -9,7 +9,7 @@ help:
 # Start the development server
 dev:
 	@echo "Starting development server..."
-	go run cmd/unheicd/main.go
+	go run unheicd/main.go
 
 # Run tests
 test:

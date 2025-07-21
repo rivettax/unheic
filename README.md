@@ -17,12 +17,14 @@ A simple HTTP API service that converts HEIC/HEIF images to JPEG format using Go
 ## Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd unheic
 ```
 
 2. Install dependencies:
+
 ```bash
 go mod download
 ```
@@ -37,6 +39,7 @@ go run cmd/unheicd/main.go
 ```
 
 The server will start on port 8080. You should see:
+
 ```
 Starting server on :8080
 ```
@@ -72,6 +75,7 @@ curl -X POST http://localhost:8080/convert \
 ### 3. Verify Results
 
 Check that the conversion worked:
+
 ```bash
 # Check file sizes
 ls -la test_heic/*.heic test_heic/output/*.jpg
@@ -122,27 +126,31 @@ else:
 ### Using JavaScript/Node.js
 
 ```javascript
-const fs = require('fs');
-const axios = require('axios');
+const fs = require("fs");
+const axios = require("axios");
 
 async function convertHeicToJpeg(inputFile, outputFile) {
-    try {
-        const imageData = fs.readFileSync(inputFile);
-        const response = await axios.post('http://localhost:8080/convert', imageData, {
-            headers: {
-                'Content-Type': 'image/heic'
-            },
-            responseType: 'arraybuffer'
-        });
-        
-        fs.writeFileSync(outputFile, response.data);
-        console.log('Conversion successful!');
-    } catch (error) {
-        console.error('Error:', error.response?.data || error.message);
-    }
+  try {
+    const imageData = fs.readFileSync(inputFile);
+    const response = await axios.post(
+      "http://localhost:8080/convert",
+      imageData,
+      {
+        headers: {
+          "Content-Type": "image/heic",
+        },
+        responseType: "arraybuffer",
+      }
+    );
+
+    fs.writeFileSync(outputFile, response.data);
+    console.log("Conversion successful!");
+  } catch (error) {
+    console.error("Error:", error.response?.data || error.message);
+  }
 }
 
-convertHeicToJpeg('test_heic/test.heic', 'test_heic/output/converted.jpg');
+convertHeicToJpeg("test_heic/test.heic", "test_heic/output/converted.jpg");
 ```
 
 ## Error Handling
@@ -154,9 +162,10 @@ The API returns appropriate HTTP status codes:
 - **500 Internal Server Error**: Server error
 
 Error responses include descriptive messages:
+
 ```json
 {
-    "error": "Failed to convert image: <error details>"
+  "error": "Failed to convert image: <error details>"
 }
 ```
 
@@ -175,23 +184,37 @@ The server can be configured by modifying the following parameters in `cmd/unhei
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+### 🚀 **TL;DR - Safe Usage**
+
+**✅ SAFE: Using the container as-is** - You can deploy and use the UnHEIC service container in production without any copyleft obligations. No license restrictions apply to simply running the service.
+
+**⚠️ COPYLEFT APPLIES: Only if you modify the service code** - If you modify the Go service code (not client code), you must release those modifications under LGPL-3.0.
+
+### License Details
+
+The service code is licensed under the LGPL-3.0, and the client code is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 **Third-Party Licenses:**
+
 - This project uses the [jdeng/goheif](https://github.com/jdeng/goheif) package, which is MIT licensed.
 - The goheif package includes and statically linked code from:
   - **libde265** (LGPL-3.0)
   - **heif** (Apache-2.0)
 
-**Implications:**
-- By using this project, you inherit the obligations of the LGPL-3.0 and Apache-2.0 licenses for the portions of code provided by those libraries.
-- The MIT license applies to all original code in this repository.
-- The LGPL-3.0 and Apache-2.0 licenses apply to the respective third-party code included via dependencies (notably via goheif and its vendored libraries).
+**What This Means for You:**
+
+- **✅ Container Deployment**: Deploy the service container to any cloud platform without license concerns
+- **✅ Client Code**: Use, modify, and distribute the client examples under MIT license
+- **✅ API Usage**: Call the API from your applications with no restrictions
+- **⚠️ Service Modifications**: If you modify the Go service code, those changes must be released under LGPL-3.0
+- **ℹ️ Third-Party Code**: LGPL-3.0 and Apache-2.0 apply to the respective vendored libraries
 
 **Summary of goheif License Note:**
+
 > Note: The directories 'heif' and 'libde265' contain third-party code which is licensed under their respective licenses (Apache-2.0 and LGPL-3.0) as provided in those directories.
 
-**In summary:**
-- You may use, copy, modify, and distribute this project under the terms of the MIT license.
-- If you distribute binaries or modified versions, you must also comply with the LGPL-3.0 and Apache-2.0 licenses for the relevant portions of the codebase.
+**Bottom Line:**
 
+- **Use the service as-is**: No copyleft obligations
+- **Modify client code**: MIT license applies
+- **Modify service code**: LGPL-3.0 copyleft applies to your modifications only

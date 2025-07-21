@@ -11,7 +11,7 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN CGO_ENABLED=1 GOOS=linux go build -o /app/server ./cmd/unheicd/main.go
+RUN CGO_ENABLED=1 GOOS=linux go build -o /app/server ./unheicd/main.go
 
 # Final stage
 FROM debian:12

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/rivettax/unheic/internal"
+	"github.com/rivettax/unheic/unheicd/internal"
 )
 
 func main() {
