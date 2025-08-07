@@ -8,34 +8,34 @@ import (
 	"net/http"
 )
 
+var ErrBadRequest = errors.New("bad request")
+
 type Client struct {
 	httpClient *http.Client
 	baseURL    string
 }
 
-type ClientParams struct {
-	// BaseURL is the base URL of the unheic server. Default is http://localhost:8080
-	BaseURL string
+type ClientOption func(*Client)
 
-	// HTTPClient is the HTTP client to use. Default is http.Client{}
-	HTTPClient *http.Client
+func WithHTTPClient(client *http.Client) ClientOption {
+	return func(c *Client) { c.httpClient = client }
 }
 
-var ErrBadRequest = errors.New("bad request")
+func WithBaseURL(url string) ClientOption {
+	return func(c *Client) { c.baseURL = url }
+}
 
-func NewClient(params ClientParams) *Client {
-	if params.HTTPClient == nil {
-		params.HTTPClient = &http.Client{}
+func NewClient(opts ...ClientOption) *Client {
+	c := &Client{
+		httpClient: &http.Client{},
+		baseURL:    "http://localhost:8080",
 	}
 
-	if params.BaseURL == "" {
-		params.BaseURL = "http://localhost:8080"
+	for _, opt := range opts {
+		opt(c)
 	}
 
-	return &Client{
-		httpClient: params.HTTPClient,
-		baseURL:    params.BaseURL,
-	}
+	return c
 }
 
 func (c *Client) Convert(ctx context.Context, src io.Reader) (io.Reader, error) {
