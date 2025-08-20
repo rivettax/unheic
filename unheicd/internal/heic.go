@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"fmt"
 	"image/jpeg"
 	"io"
 
@@ -16,7 +17,13 @@ type EncodeError struct{ Err error }
 
 func (e EncodeError) Error() string { return e.Err.Error() }
 
-func HeicToJPEG(ctx context.Context, w io.Writer, r io.Reader) error {
+func HeicToJPEG(ctx context.Context, w io.Writer, r io.Reader) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = DecodeError{fmt.Errorf("panic in HEIC decoder: %v", r)}
+		}
+	}()
+
 	img, err := goheif.Decode(r)
 	if err != nil {
 		return DecodeError{err}
