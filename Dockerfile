@@ -3,18 +3,18 @@ FROM golang:1.24-bookworm AS builder
 
 WORKDIR /app
 
-# Copy go mod files
-COPY go.mod go.sum ./
+# Copy go mod files from unheicd directory
+COPY unheicd/go.mod unheicd/go.sum ./
 RUN go mod download
 
 # Copy source code
-COPY . .
+COPY unheicd/ .
 
 # Build the application
-RUN CGO_ENABLED=1 GOOS=linux go build -o /app/server ./unheicd/main.go
+RUN CGO_ENABLED=1 GOOS=linux go build -o /app/server ./main.go
 
 # Final stage
-FROM debian:12
+FROM debian:12-slim
 
 # Create a non-root user and set up their home directory
 RUN useradd -m -d /home/appuser -s /bin/bash appuser && \
