@@ -38,7 +38,7 @@ func NewClient(opts ...ClientOption) *Client {
 	return c
 }
 
-func (c *Client) Convert(ctx context.Context, src io.Reader) (io.Reader, error) {
+func (c *Client) Convert(ctx context.Context, src io.Reader) (io.ReadCloser, error) {
 	req, err := http.NewRequestWithContext(ctx, "POST", c.baseURL+"/convert", src)
 	if err != nil {
 		return nil, err
@@ -50,7 +50,6 @@ func (c *Client) Convert(ctx context.Context, src io.Reader) (io.Reader, error) 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusBadRequest {
 		return nil, ErrBadRequest
