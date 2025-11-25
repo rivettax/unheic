@@ -9,9 +9,9 @@ help:
 # Start the development server
 dev:
 	@echo "Starting development server..."
-	go run unheicd/main.go
+	cd unheicd && go run main.go
 
 # Run tests
 test:
 	@echo "Running tests..."
-	go test ./... 
+	cd unheicd && go test ./... 
