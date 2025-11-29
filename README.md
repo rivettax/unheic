@@ -210,7 +210,7 @@ The server can be configured by modifying the following environment variables:
 
 ## Dependencies
 
-- `github.com/jdeng/goheif` - HEIC/HEIF decoding library
+- `github.com/strukturag/libheif` - HEIC/HEIF decoding library
 - Standard Go libraries for HTTP server and image processing
 
 ## License
@@ -227,10 +227,7 @@ The service code is licensed under the LGPL-3.0, and the client code is licensed
 
 **Third-Party Licenses:**
 
-- This project uses the [jdeng/goheif](https://github.com/jdeng/goheif) package, which is MIT licensed.
-- The goheif package includes and statically linked code from:
-  - **libde265** (LGPL-3.0)
-  - **heif** (Apache-2.0)
+- This project uses the [strukturag/libheif](https://github.com/strukturag/libheif) package, which is LGPL-3.0 licensed.
 
 **What This Means for You:**
 
@@ -238,11 +235,7 @@ The service code is licensed under the LGPL-3.0, and the client code is licensed
 - **✅ Client Code**: Use, modify, and distribute the client examples under MIT license
 - **✅ API Usage**: Call the API from your applications with no restrictions
 - **⚠️ Service Modifications**: If you modify the Go service code, those changes must be released under LGPL-3.0
-- **ℹ️ Third-Party Code**: LGPL-3.0 and Apache-2.0 apply to the respective vendored libraries
-
-**Summary of goheif License Note:**
-
-> Note: The directories 'heif' and 'libde265' contain third-party code which is licensed under their respective licenses (Apache-2.0 and LGPL-3.0) as provided in those directories.
+- **ℹ️ Third-Party Code**: LGPL-3.0 applies to the libheif library
 
 **Bottom Line:**
 
