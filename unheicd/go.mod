@@ -1,5 +1,5 @@
 module github.com/rivettax/unheic/unheicd
 
-go 1.22.3
+go 1.25.0
 
-require github.com/jdeng/goheif v0.0.0-20250603221700-0b111b5c3adb
+require github.com/strukturag/libheif v1.19.8
