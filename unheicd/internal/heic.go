@@ -6,7 +6,7 @@ import (
 	"image/jpeg"
 	"io"
 
-	"github.com/jdeng/goheif"
+	"github.com/strukturag/libheif/go/heif"
 )
 
 type DecodeError struct{ Err error }
@@ -24,12 +24,37 @@ func HeicToJPEG(ctx context.Context, w io.Writer, r io.Reader) (err error) {
 		}
 	}()
 
-	img, err := goheif.Decode(r)
+	data, err := io.ReadAll(r)
 	if err != nil {
 		return DecodeError{err}
 	}
 
-	err = jpeg.Encode(w, img, &jpeg.Options{Quality: 90})
+	context, err := heif.NewContext()
+	if err != nil {
+		return DecodeError{err}
+	}
+
+	err = context.ReadFromMemory(data)
+	if err != nil {
+		return DecodeError{err}
+	}
+
+	handle, err := context.GetPrimaryImageHandle()
+	if err != nil {
+		return DecodeError{err}
+	}
+
+	img, err := handle.DecodeImage(heif.ColorspaceUndefined, heif.ChromaUndefined, nil)
+	if err != nil {
+		return DecodeError{err}
+	}
+
+	goImg, err := img.GetImage()
+	if err != nil {
+		return DecodeError{err}
+	}
+
+	err = jpeg.Encode(w, goImg, &jpeg.Options{Quality: 90})
 	if err != nil {
 		return EncodeError{err}
 	}
