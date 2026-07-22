@@ -1,0 +1,70 @@
+# Deploy pipeline for the unheic service (RIV-1180).
+#
+# Builds the image from the repo-root Dockerfile, pushes it to shared-services
+# ECR, then rolls each environment's ECS service to it in order: development
+# first, staging once development is stable (production later, gated — see
+# RIV-1346). Pulumi (rivettax/rivet infrastructure/workload) seeds the initial
+# task definition; this pipeline owns the live image thereafter (the ECS
+# service ignores taskDefinition drift).
+#
+# The scripts in .buildkite/scripts/ are copies of the rivettax/rivet ones —
+# the shape mirrors that repo's deploy-core.yml, where each step's role ARN is
+# the single place its AWS account ID appears: the build script derives the
+# ECR registry from the assumed role's own identity, and the ecr plugin
+# defaults to that account too.
+#
+# No if_changed filter: the whole repo is the service.
+
+env:
+  AWS_REGION: &aws_region us-west-2
+  ECR_REPO: rivet/unheic
+  IMAGE_CONTEXT: .
+  CONTAINER_NAME: unheic
+  ECS_SERVICE: unheic
+
+agents:
+  queue: "default"
+
+steps:
+  - label: ":docker: Build and push"
+    key: build-and-push
+    command: .buildkite/scripts/image-build-push.sh
+    plugins:
+      - aws-assume-role-with-web-identity#v1.6.0:
+          # PulumiDeployer in rivet-shared-services, which owns the ECR
+          # registry every environment pulls from.
+          role-arn: arn:aws:iam::656326302886:role/PulumiDeployer
+          region: *aws_region
+      # No account-ids: defaults to the account of the current credentials —
+      # the shared-services role assumed above.
+      - ecr#v2.12.0:
+          login: true
+          region: *aws_region
+
+  - label: ":ecs: Deploy to development"
+    key: deploy-development
+    depends_on: build-and-push
+    env:
+      ECS_CLUSTER: rivet-development
+      TASK_FAMILY: rivet-development-unheic
+    command: .buildkite/scripts/ecs-deploy.sh
+    plugins:
+      - aws-assume-role-with-web-identity#v1.6.0:
+          # PulumiDeployer in rivet-development.
+          role-arn: arn:aws:iam::951013218268:role/PulumiDeployer
+          region: *aws_region
+
+  - label: ":ecs: Deploy to staging"
+    key: deploy-staging
+    # Progressive rollout: staging only rolls once development is stable
+    # (services-stable in the dev step), so a bad image stops in dev.
+    depends_on: deploy-development
+    env:
+      ECS_CLUSTER: rivet-staging
+      TASK_FAMILY: rivet-staging-unheic
+    command: .buildkite/scripts/ecs-deploy.sh
+    plugins:
+      - aws-assume-role-with-web-identity#v1.6.0:
+          # PulumiDeployer in rivet-staging.
+          role-arn: arn:aws:iam::696000197535:role/PulumiDeployer
+          region: *aws_region
